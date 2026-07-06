@@ -1,28 +1,69 @@
 package br.com.reireal.domain.entity;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "item_pedido")
 public class ItemPedido {
-    @Id
-    @GeneratedValue
     private UUID id;
-    @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
-    @Column(name = "preco_unitario", nullable = false)
-    private BigDecimal precoUnitario;
-    @Column(name = "subtotal", nullable = false)
-    private BigDecimal subtotal;
-    
+    private BigDecimal valorUnitario;
+    private BigDecimal subTotal;
+    private Produto produto;
+   
 
-
-    
+public ItemPedido(Produto produto){
+    validarProduto(produto);
+    this.id = UUID.randomUUID();
+    this.produto = produto;
+    this.quantidade = 1;
+    this.valorUnitario = produto.getValorUnitario();
+    this.subTotal = calcularSubTotal();
+    }
+    public UUID getId() {
+        return id;
+    }
+    public BigDecimal getValorUnitario() {
+        return valorUnitario;
+    }
+   public BigDecimal getSubTotal() {
+    return subTotal;
+}
+    public Produto getProduto() {
+        return produto;
+    }
+    public Integer getQuantidade() {
+        return quantidade;
+    }
+    public void alterarQuantidade(Integer quantidade) {
+        validarQuantidade(quantidade);
+        this.quantidade = quantidade;
+        this.subTotal = calcularSubTotal();
+    }
+    public void aumentarQuantidade(Integer quantidade) {
+        validarQuantidade(quantidade);
+        this.quantidade += quantidade;
+        this.subTotal = calcularSubTotal();
+    }
+    public void diminuirQuantidade(Integer quantidade) {
+        validarQuantidade(quantidade);
+        if (this.quantidade - quantidade <= 0) {
+            throw new IllegalArgumentException("A quantidade não pode ser menor ou igual a zero");
+        }
+        this.quantidade -= quantidade;
+        this.subTotal = calcularSubTotal();
+    }
+    private BigDecimal calcularSubTotal() {
+        return this.valorUnitario.multiply(BigDecimal.valueOf(this.quantidade));
+    }
+    private void validarProduto(Produto produto) {
+        if (produto == null) {
+            throw new IllegalArgumentException("O produto não pode ser nulo");
+        }
+    }
+    private void validarQuantidade(Integer quantidade){
+        if(quantidade <= 0){
+            throw new IllegalArgumentException("A quantidade deve ser maior que zero");
+        }
+    }
 
 }
