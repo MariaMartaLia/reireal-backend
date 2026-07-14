@@ -14,15 +14,15 @@ public class Usuario {
 
 
     public Usuario(String nome,String login,String senha,FuncaoUsuario funcao) {
-        this.id = UUID.randomUUID();
         validarNome(nome);
-        this.nome = nome;
         validarLogin(login);
-        this.login = login;
         validarSenha(senha);
-        this.senha = senha;
         ativar( );
         validarFuncao(funcao);
+        this.id = UUID.randomUUID();
+        this.nome = nome;
+        this.login = login;
+        this.senha = senha;
         this.funcao = funcao;
     }
     

@@ -13,21 +13,17 @@ public class Produto {
     private Categoria categoria;
 
     public Produto(String nome, BigDecimal valorUnitario, Integer estoque, Categoria categoria) {
-        this.id = UUID.randomUUID();
-
+        
         validarNome(nome);
-        this.nome = nome;
-
         validarValorUnitario(valorUnitario);
-        this.valorUnitario = valorUnitario;
-
         validarEstoque(estoque);
-        this.estoque = estoque;
-
         validarCategoria(categoria);
-        this.categoria = categoria;
-
         ativar();
+        this.id = UUID.randomUUID();
+        this.nome = nome;
+        this.valorUnitario = valorUnitario;
+        this.estoque = estoque;
+        this.categoria = categoria;
     }
 
     public UUID getId() {

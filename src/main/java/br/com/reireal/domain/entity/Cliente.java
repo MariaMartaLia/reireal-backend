@@ -13,14 +13,14 @@ public class Cliente {
     private LocalDate dataCadastro;
 
     public Cliente (String nome, String telefone, String email, LocalDate dataNascimento) {
+         validarNome(nome);
+         validarTelefone(telefone);
+         validarEmail(email);
+         validarDataNascimento(dataNascimento);
         this.id = UUID.randomUUID();
-        validarNome(nome);
         this.nome = nome;
-        validarTelefone(telefone);
         this.telefone = telefone;
-        validarEmail(email);
         this.email = email;
-        validarDataNascimento(dataNascimento);
         this.dataNascimento = dataNascimento;
         this.ativo = true;
         this.dataCadastro = LocalDate.now();

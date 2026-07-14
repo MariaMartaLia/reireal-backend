@@ -1,90 +1,118 @@
 package br.com.reireal.domain.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import br.com.reireal.domain.enums.StatusPedido;
 
 public class Pedido {
+
     private UUID id;
-    private LocalDate dataPedido;
-    private BigDecimal valorTotal;
-    private Cliente cliente;
-    private List<ItemPedido> itens;
+    private LocalDateTime dataPedido;
+    private BigDecimal total;
     private StatusPedido status;
-    private Usuario usuarioResponsavel;
+    private List<ItemPedido> itens;
+    private Cliente cliente;
 
 
-    public Pedido(LocalDate dataPedido, BigDecimal valorTotal, boolean ativo, List<ItemPedido> itens, StatusPedido status, Usuario usuarioResponsavel,Cliente cliente) {
-        this.id = UUID.randomUUID();
-        validarDataPedido(dataPedido);
-        this.dataPedido = LocalDate.now();
-        validarValorTotal(valorTotal);
-        this.valorTotal = valorTotal;
+    public Pedido (Cliente cliente ){
         validarCliente(cliente);
-        this.cliente = cliente;
-        validarItens(itens);
-        this.itens = itens;
-        validarStatus(status);
-        this.status = StatusPedido.PENDENTE; 
-        validarUsuarioResponsavel(usuarioResponsavel);
-        this.usuarioResponsavel = usuarioResponsavel;
+        this.id = UUID.randomUUID();
+        this.dataPedido = LocalDateTime.now();
+        this.total= BigDecimal.ZERO;
+        this.status =  StatusPedido.PENDENTE;
+        this.itens = new ArrayList<>();
+        this.cliente = cliente;         
     }
-    private void validarDataPedido(LocalDate dataPedido) {
-        if (dataPedido == null) {
-            throw new IllegalArgumentException("A data do pedido não pode ser nula.");
-        }
-    }
-    private void validarValorTotal(BigDecimal valorTotal) {
-        if (valorTotal == null || valorTotal.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("O valor total do pedido não pode ser nulo ou negativo.");
-        }
-    }
-    private void validarAtivo(boolean ativo) {
-        // Não há validação específica para o campo ativo, mas você pode adicionar regras se necessário.
-    }
-    private void validarCliente(Cliente cliente) {
-        if (cliente == null) {
-            throw new IllegalArgumentException("O cliente do pedido não pode ser nulo.");
-        }
-    }
-    private void validarItens(List<ItemPedido> itens) {
-        if (itens == null || itens.isEmpty()) {
-            throw new IllegalArgumentException("A lista de itens do pedido não pode ser nula ou vazia.");
-        }
-    }
-    private void validarStatus(StatusPedido status) {
-        if (status == null) {
-            throw new IllegalArgumentException("O status do pedido não pode ser nulo.");
-        }
-    }
-    private void validarUsuarioResponsavel(Usuario usuarioResponsavel) {
-        if (usuarioResponsavel == null) {
-            throw new IllegalArgumentException("O usuário responsável não pode ser nulo.");
-        }
-    }
-    public UUID getId() {
-        return id;
-    }
-    public LocalDate getDataPedido() {
-        return dataPedido;
-    }
-    public BigDecimal getValorTotal() {
-        return valorTotal;
-    }
-    public Cliente getCliente() {
-        return cliente;
-    }
-    public List<ItemPedido> getItens() {
-        return itens;
-    }
-    public StatusPedido getStatus() {
-        return status;
-    }
-    public Usuario getUsuarioResponsavel() {
-        return usuarioResponsavel;
+   public UUID getId(){
+    return id;
+   }
+   public LocalDateTime getDataPedido( ){
+    return dataPedido;
+   }
+   public BigDecimal getTotal(){
+    return total;
+   }
+   public StatusPedido getStatus(){
+    return status;
+   }
+   public List<ItemPedido> getItens( ){
+    return itens;
+   }
+   public Cliente getCliente(){
+    return cliente;
+   }
+
+   private void validarCliente(Cliente cliente){
+        if(cliente == null){
+        throw new IllegalArgumentException("Pedido não pode ser feito sem um cliente!");
+    } 
+}
+private void validarItemPedido(ItemPedido itemPedido){
+    if(itemPedido ==null){
+        throw new IllegalArgumentException( "ItemPedido não pode ser nulo");
     }
 }
+public void adicionarItem(ItemPedido itemPedido) { 
+
+    validarItemPedido(itemPedido);
+
+    for (ItemPedido itemExistente : itens) {         
+
+        if (itemExistente.getProduto()
+                .equals(itemPedido.getProduto())) {  
+
+            itemExistente.aumentarQuantidade(
+                    itemPedido.getQuantidade()
+            );
+            calcularTotal();
+            return;
+    } } 
+    itens.add(itemPedido);
+    calcularTotal();
+} 
+private void calcularTotal(){
+    total=BigDecimal.ZERO;
+    for (ItemPedido itemPedido : itens){
+        total = total.add(itemPedido.getSubTotal());
+
+    }
+} 
+public void confirmarPagamento(){
+    if(status != StatusPedido.PENDENTE){
+           throw new IllegalStateException("O pagamento só pode ser confirmado para pedidos pendentes.");
+        }
+        status = StatusPedido.PAGAMENTO_REALIZADO;
+}
+public void comecarSeparacao(){
+    if(status != StatusPedido.PAGAMENTO_REALIZADO){
+       throw new IllegalStateException("O pedido so pode ser separado se pagamento for confirmado!!");
+     
+}
+status = StatusPedido.EM_SEPARACAO;
+    
+}
+public void finalizarSeparacao(){
+    if( status != StatusPedido.EM_SEPARACAO){
+        throw new IllegalStateException("O pedido só pode ficar pronto para entrega se estiver em separação.");
+    }
+    status = StatusPedido.PRONTO_PARA_ENTREGA;
+}
+public void entregarPedido(){
+    if(status != StatusPedido.PRONTO_PARA_ENTREGA){
+        throw new IllegalStateException("O pedido só pode ser entregue se estiver pronto para entrega.");
+    }
+    status = StatusPedido.ENTREGUE;
+}
+public void cancelarPedido(){
+    if (status != StatusPedido.PENDENTE){
+        throw new IllegalStateException("O pedido só pode ser cancelado se estiver pendente.");
+    }
+    status = StatusPedido.CANCELADO;
+}
+
+}  
 
