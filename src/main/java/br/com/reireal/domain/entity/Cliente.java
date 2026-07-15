@@ -1,5 +1,6 @@
 package br.com.reireal.domain.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -9,6 +10,7 @@ public class Cliente {
     private String telefone;
     private String email ;
     private LocalDate dataNascimento;
+    private BigDecimal credito;
     private boolean ativo;
     private LocalDate dataCadastro;
 
@@ -22,6 +24,7 @@ public class Cliente {
         this.telefone = telefone;
         this.email = email;
         this.dataNascimento = dataNascimento;
+        this.credito = BigDecimal.ZERO;
         this.ativo = true;
         this.dataCadastro = LocalDate.now();
     }
@@ -40,13 +43,15 @@ public class Cliente {
     public LocalDate getDataNascimento() {
         return dataNascimento;
     }
+    public BigDecimal getCredito(){
+        return credito;
+    }
     public boolean isAtivo() {
         return ativo;
     }
     public LocalDate getDataCadastro() {
         return dataCadastro;
     }
-
     public void ativar() {
         this.ativo = true;
     }
@@ -67,6 +72,24 @@ public class Cliente {
             throw new IllegalStateException("Cliente já está desativado.");
         }
         this.ativo = false;
+    }
+    public void adicionarCreditoCliente(BigDecimal valor ){
+        validarCredito(valor);
+        credito = credito.add(valor);
+    }
+    public void utilizarCredito(BigDecimal valor){
+        validarUsoCredito(valor);
+       credito = credito.subtract(valor);
+    }
+    private void validarUsoCredito(BigDecimal valor){
+        if(valor == null || valor.compareTo(BigDecimal.ZERO) <= 0 || valor.compareTo(credito) > 0){
+            throw new IllegalArgumentException("Valor não pode ser menor que zero");
+        }
+    }
+    private void validarCredito(BigDecimal credito ){
+        if(credito == null ||credito.compareTo(BigDecimal.ZERO) <= 0){
+            throw new IllegalArgumentException("Crédito não pode ser nulo ou menor que zero.");
+        }
     }
     private void validarNome(String nome){
         if (nome == null || nome.isBlank() || nome.length() < 3 || nome.length() > 50 || !nome.matches("^[a-zA-ZÀ-ÿ\\s]+$")) {
