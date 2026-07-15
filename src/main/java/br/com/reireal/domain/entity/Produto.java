@@ -129,5 +129,10 @@ public class Produto {
         if (categoria == null) {
             throw new IllegalArgumentException("Categoria inválida. A categoria não pode ser nula.");
         }
+        if (!categoria.isAtivo()) {
+        throw new IllegalStateException(
+            "Produto não pode ser associado a uma categoria desativada."
+        );
+    }
     }
 }
