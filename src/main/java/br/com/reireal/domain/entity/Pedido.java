@@ -74,6 +74,20 @@ public void adicionarItem(ItemPedido itemPedido) {
     itens.add(itemPedido);
     calcularTotal();
 } 
+public void diminuirItem(ItemPedido itemPedido){
+    validarItemPedido(itemPedido);
+    
+    for (ItemPedido itemExistente : itens){
+     if(itemExistente.getProduto().equals(itemPedido.getProduto()) && itemExistente.getQuantidade() > 1){
+        itemExistente.diminuirQuantidade(1);
+        calcularTotal();
+}
+    if(itemExistente.getProduto().equals(itemPedido.getProduto()) && itemExistente.getQuantidade() == 1){
+        itens.remove(itemExistente);
+}
+        calcularTotal();
+        return;
+    }}
 private void calcularTotal(){
     total=BigDecimal.ZERO;
     for (ItemPedido itemPedido : itens){
